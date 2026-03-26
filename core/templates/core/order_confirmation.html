@@ -1,0 +1,44 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Confirmation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <script src="{% static 'js/theme.js' %}" defer></script>
+</head>
+<body>
+    <div class="page-backdrop"><div class="orb"></div></div>
+
+    <section class="center-stage">
+        <div class="glass-card center-card">
+            <div class="theme-kicker">Order confirmed</div>
+            <h1 class="hero-title" style="font-size: clamp(2.2rem, 5vw, 3.2rem);">Your order has been placed successfully.</h1>
+            <p class="hero-subtitle">
+                The billing flow is complete and your invoice-ready purchase summary is now available.
+            </p>
+
+            <div class="timeline-box">
+                <div class="timeline-item">
+                    <strong>Order IDs:</strong>
+                    {% for order in orders %}
+                        #{{ order.id }}{% if not forloop.last %}, {% endif %}
+                    {% endfor %}
+                </div>
+                <div class="timeline-item"><strong>Payment method:</strong> {{ orders.0.payment_method }}</div>
+                <div class="timeline-item"><strong>Order date:</strong> {{ orders.0.created_at|date:"d M Y, H:i" }}</div>
+                <div class="timeline-item"><strong>Total paid:</strong> Rs {{ total_amount }}</div>
+            </div>
+
+            <div class="action-row" style="margin-top: 28px;">
+                <a href="{% url 'dashboard' %}" class="btn btn-primary">Return to dashboard</a>
+                <a href="{% url 'orders' %}" class="btn btn-secondary">Review orders</a>
+            </div>
+        </div>
+    </section>
+</body>
+</html>

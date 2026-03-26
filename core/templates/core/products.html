@@ -1,0 +1,65 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Products{% endblock %}
+
+{% block content %}
+<section class="page-intro">
+    <div>
+        <div class="eyebrow">Catalog</div>
+        <h1 class="page-title">Products</h1>
+        <p class="page-subtitle">A cleaner catalog table for stock visibility, price review, and faster operational decisions.</p>
+    </div>
+</section>
+
+<section class="table-panel">
+    <div class="panel-header">
+        <div>
+            <h2 class="panel-title">Inventory list</h2>
+            <p class="panel-meta">Low stock products are highlighted for quick scanning.</p>
+        </div>
+    </div>
+
+    <div class="table-scroll">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Product Name</th>
+                    <th>Vendor</th>
+                    <th>Price</th>
+                    <th>Quantity</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for product in products %}
+                    <tr>
+                        <td>#{{ product.id }}</td>
+                        <td><strong>{{ product.name }}</strong></td>
+                        <td>
+                            {% if product.vendor %}
+                                {{ product.vendor.company_name|default:product.vendor.name }}
+                            {% else %}
+                                Not linked
+                            {% endif %}
+                        </td>
+                        <td>Rs {{ product.price }}</td>
+                        <td>{{ product.quantity }}</td>
+                        <td>
+                            {% if product.quantity < 5 %}
+                                <span class="status-pill status-danger">Low Stock</span>
+                            {% else %}
+                                <span class="status-pill status-success">Available</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="6" class="empty-state">No products available.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

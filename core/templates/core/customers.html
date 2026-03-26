@@ -1,0 +1,47 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Customers{% endblock %}
+
+{% block content %}
+<section class="page-intro">
+    <div>
+        <div class="eyebrow">Customer data</div>
+        <h1 class="page-title">Customers</h1>
+        <p class="page-subtitle">A consistent customer directory with strong readability for contact and relationship management.</p>
+    </div>
+</section>
+
+<section class="table-panel">
+    <div class="panel-header">
+        <div>
+            <h2 class="panel-title">Customer directory</h2>
+            <p class="panel-meta">Core customer details in the same shared operations style.</p>
+        </div>
+    </div>
+
+    <div class="table-scroll">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Phone</th>
+                    <th>Email</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for customer in customers %}
+                    <tr>
+                        <td><strong>{{ customer.name }}</strong></td>
+                        <td>{{ customer.phone }}</td>
+                        <td>{{ customer.email }}</td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="3" class="empty-state">No customers found.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

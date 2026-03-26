@@ -1,0 +1,55 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Inventory Billing System{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <script src="{% static 'js/theme.js' %}" defer></script>
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    <div class="page-backdrop"><div class="orb"></div></div>
+
+    <header class="site-header">
+        <div class="site-header-inner">
+            <a class="brand" href="{% url 'landing' %}">
+                <span class="brand-mark">IB</span>
+                <span class="brand-copy">
+                    <strong>Inventory Billing</strong>
+                    <span>Operations, orders, and growth in one place</span>
+                </span>
+            </a>
+
+            <nav class="site-nav">
+                <a href="{% url 'dashboard' %}">Dashboard</a>
+                <a href="{% url 'products' %}">Products</a>
+                <a href="{% url 'orders' %}">Orders</a>
+                {% if request.user.is_authenticated and request.user.userprofile.role != 'customer' %}
+                    <a href="{% url 'customers' %}">Customers</a>
+                    <a href="{% url 'vendors' %}">Vendors</a>
+                {% endif %}
+                {% if request.user.is_authenticated and request.user.userprofile.role == 'admin' %}
+                    <a href="{% url 'create_order' %}">Billing</a>
+                {% endif %}
+                <button type="button" class="theme-toggle" data-theme-toggle>Switch theme</button>
+                {% if request.user.is_authenticated %}
+                    <a href="{% url 'logout' %}">Logout</a>
+                {% else %}
+                    <a href="{% url 'login' %}">Login</a>
+                {% endif %}
+            </nav>
+        </div>
+    </header>
+
+    <main class="main-shell">
+        {% block content %}{% endblock %}
+    </main>
+
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>

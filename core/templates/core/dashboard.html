@@ -1,0 +1,171 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <script src="{% static 'js/theme.js' %}" defer></script>
+</head>
+<body>
+    <div class="page-backdrop"><div class="orb"></div></div>
+
+    <header class="site-header">
+        <div class="site-header-inner">
+            <a class="brand" href="{% url 'dashboard' %}">
+                <span class="brand-mark">IB</span>
+                <span class="brand-copy">
+                    <strong>Customer Workspace</strong>
+                    <span>Browse, order, and track with confidence</span>
+                </span>
+            </a>
+            <nav class="site-nav">
+                <a href="{% url 'dashboard' %}" class="is-active">Dashboard</a>
+                <a href="{% url 'products' %}">Products</a>
+                <a href="{% url 'view_cart' %}">Cart</a>
+                <a href="{% url 'orders' %}">Orders</a>
+                <a href="{% url 'logout' %}">Logout</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main-shell">
+        <section class="hero-panel alt" style="margin-bottom: 24px;">
+            <div class="eyebrow">Customer dashboard</div>
+            <div class="page-intro" style="margin-bottom: 0;">
+                <div>
+                    <h1 class="page-title">Welcome back, {{ user_name }}</h1>
+                    <p class="page-subtitle">Review live inventory, add items to your cart, and keep track of recent orders from one clean view.</p>
+                </div>
+                <div class="action-row">
+                    <a href="{% url 'view_cart' %}" class="btn btn-primary">Open cart</a>
+                    <a href="{% url 'orders' %}" class="btn btn-secondary">View order history</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="metrics-grid" style="margin-bottom: 24px;">
+            <div class="metric-card">
+                <div class="metric-label">Recent Orders</div>
+                <div class="metric-value">{{ total_orders }}</div>
+                <div class="metric-note">Orders currently tied to your account.</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Latest Summary</div>
+                <div class="metric-value">Rs {{ final_total|default:"0" }}</div>
+                <div class="metric-note">Final amount from your most recent order snapshot.</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Discount Applied</div>
+                <div class="metric-value">{{ discount_percent|default:"0" }}%</div>
+                <div class="metric-note">{{ discount_type|default:"No current discount" }}</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Tax Standard</div>
+                <div class="metric-value">{{ gst_amount }}%</div>
+                <div class="metric-note">GST is reflected during billing and checkout.</div>
+            </div>
+        </section>
+
+        <section class="split-layout">
+            <div class="surface-grid">
+                <div class="panel">
+                    <div class="panel-header">
+                        <div>
+                            <div class="eyebrow">Available catalog</div>
+                            <h2 class="panel-title">Products ready for ordering</h2>
+                        </div>
+                    </div>
+
+                    <div class="catalog-grid">
+                        {% for product in products %}
+                            <article class="product-card">
+                                <span class="status-pill {% if product.quantity > 50 %}status-success{% elif product.quantity > 0 %}status-warning{% else %}status-danger{% endif %}">
+                                    {% if product.quantity > 50 %}In Stock
+                                    {% elif product.quantity > 0 %}Low Stock
+                                    {% else %}Out of Stock
+                                    {% endif %}
+                                </span>
+                                <h3>{{ product.name }}</h3>
+                                <p class="mini-copy">Live inventory visibility with tax-aware billing.</p>
+                                <div class="price-tag">Rs {{ product.price }}</div>
+                                <div class="meta-row"><span>Quantity available</span><strong>{{ product.quantity }}</strong></div>
+                                <div class="meta-row"><span>GST guidance</span><strong>{{ gst_amount }}%</strong></div>
+                                <form method="POST" action="{% url 'add_to_cart' %}" style="margin-top: 18px;">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="product_id" value="{{ product.id }}">
+                                    <input type="hidden" name="quantity" value="1">
+                                    <button type="submit" class="btn btn-primary btn-block" {% if product.quantity == 0 %}disabled{% endif %}>Add to cart</button>
+                                </form>
+                            </article>
+                        {% empty %}
+                            <div class="empty-state">No products are available right now.</div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <aside class="surface-grid">
+                <div class="summary-card">
+                    <div class="panel-header">
+                        <div>
+                            <div class="eyebrow">Your profile</div>
+                            <h2 class="panel-title">Customer details</h2>
+                        </div>
+                    </div>
+                    <div class="profile-card" style="margin-bottom: 22px;">
+                        <div class="detail-row"><span>Name</span><strong>{{ customer.name|default:user_name }}</strong></div>
+                        <div class="detail-row"><span>Email</span><strong>{{ customer.email|default:request.user.email }}</strong></div>
+                        <div class="detail-row"><span>Phone</span><strong>{{ customer.phone|default:"Not added yet" }}</strong></div>
+                        <div class="detail-row"><span>Address</span><strong>{{ customer.address|default:"Add during checkout" }}</strong></div>
+                    </div>
+                </div>
+
+                <div class="summary-card">
+                    <div class="panel-header">
+                        <div>
+                            <div class="eyebrow">Current snapshot</div>
+                            <h2 class="panel-title">Order summary</h2>
+                        </div>
+                    </div>
+                    <div class="summary-row"><span>Subtotal</span><strong>Rs {{ subtotal|default:"0" }}</strong></div>
+                    <div class="summary-row"><span>Discount</span><strong>- Rs {{ discount_amount|default:"0" }}</strong></div>
+                    <div class="summary-row"><span>GST</span><strong>+ Rs {{ gst_total|default:"0" }}</strong></div>
+                    <div class="summary-row"><span>Delivery</span><strong>Rs {{ delivery_charge|default:"0" }}</strong></div>
+                    <div class="summary-total"><span>Final total</span><span>Rs {{ final_total|default:"0" }}</span></div>
+                </div>
+
+                <div class="list-card">
+                    <div class="panel-header">
+                        <div>
+                            <div class="eyebrow">Recent activity</div>
+                            <h2 class="panel-title">Your latest orders</h2>
+                        </div>
+                    </div>
+
+                    <div class="stack-list">
+                        {% for order in customer_orders %}
+                            <div class="order-item">
+                                <div class="detail-row"><span>Order</span><strong>#{{ order.id }}</strong></div>
+                                <div class="detail-row"><span>Product</span><strong>{{ order.product.name }}</strong></div>
+                                <div class="detail-row"><span>Quantity</span><strong>{{ order.quantity }}</strong></div>
+                                <div class="detail-row"><span>Date</span><strong>{{ order.created_at|date:"d M Y, H:i" }}</strong></div>
+                                <div class="summary-total"><span>Final amount</span><span>Rs {{ order.final_amount }}</span></div>
+                                <div class="action-row" style="margin-top: 16px;">
+                                    <a href="{% url 'invoice' order.id %}" class="btn btn-secondary btn-block">Open invoice</a>
+                                </div>
+                            </div>
+                        {% empty %}
+                            <div class="empty-state">No recent orders yet. Add products to start your first purchase.</div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </aside>
+        </section>
+    </main>
+</body>
+</html>

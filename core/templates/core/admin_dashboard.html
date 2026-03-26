@@ -1,0 +1,130 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <script src="{% static 'js/theme.js' %}" defer></script>
+</head>
+<body>
+    <div class="page-backdrop"><div class="orb"></div></div>
+
+    <main class="main-shell">
+        <section class="hero-panel alt" style="margin-bottom: 24px;">
+            <div class="page-intro" style="margin-bottom: 0;">
+                <div>
+                    <div class="eyebrow">Admin control center</div>
+                    <h1 class="page-title">Operational oversight with a sharper dashboard</h1>
+                    <p class="page-subtitle">Review business health, staff approvals, stock risk, and top-level order performance from one professional surface.</p>
+                </div>
+                <div class="action-row">
+                    <a href="{% url 'staff_details' %}" class="btn btn-primary">Manage staff</a>
+                    <a href="{% url 'logout' %}" class="btn btn-secondary">Logout</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="metrics-grid" style="margin-bottom: 24px;">
+            <a href="{% url 'order_details' %}" class="metric-card" style="text-decoration: none;">
+                <div class="metric-label">Total Orders</div>
+                <div class="metric-value">{{ total_orders }}</div>
+                <div class="metric-note">Tap into the full order detail view.</div>
+            </a>
+            <div class="metric-card">
+                <div class="metric-label">Customers</div>
+                <div class="metric-value">{{ total_customers }}</div>
+                <div class="metric-note">Current customer count across the platform.</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Products</div>
+                <div class="metric-value">{{ total_products }}</div>
+                <div class="metric-note">Catalog size available to customers and staff.</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Revenue</div>
+                <div class="metric-value">Rs {{ total_revenue }}</div>
+                <div class="metric-note">Total billed revenue recorded in the system.</div>
+            </div>
+        </section>
+
+        <section class="split-layout">
+            <div class="surface-grid">
+                <div class="table-panel">
+                    <div class="panel-header">
+                        <div>
+                            <div class="eyebrow">Team approvals</div>
+                            <h2 class="panel-title">Pending staff requests</h2>
+                        </div>
+                    </div>
+
+                    <div class="table-scroll">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Username</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for staff in pending_staff %}
+                                    <tr>
+                                        <td><strong>{{ staff.user.username }}</strong></td>
+                                        <td><span class="status-pill status-warning">Pending</span></td>
+                                        <td><a href="{% url 'approve_staff' staff.id %}" class="btn btn-primary">Approve</a></td>
+                                    </tr>
+                                {% empty %}
+                                    <tr>
+                                        <td colspan="3" class="empty-state">No staff approvals are waiting right now.</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <aside class="surface-grid">
+                <div class="summary-card">
+                    <div class="panel-header">
+                        <div>
+                            <div class="eyebrow">Stock risk</div>
+                            <h2 class="panel-title">Low inventory watchlist</h2>
+                        </div>
+                    </div>
+                    <div class="stack-list">
+                        {% for product in low_stock %}
+                            <div class="list-item">
+                                <div class="detail-row"><span>Product</span><strong>{{ product.name }}</strong></div>
+                                <div class="detail-row"><span>Quantity left</span><strong>{{ product.quantity }}</strong></div>
+                                <span class="status-pill status-danger">Critical stock</span>
+                            </div>
+                        {% empty %}
+                            <div class="empty-state">All tracked products currently have healthy stock levels.</div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="list-card">
+                    <div class="panel-header">
+                        <div>
+                            <div class="eyebrow">Executive summary</div>
+                            <h2 class="panel-title">Admin notes</h2>
+                        </div>
+                    </div>
+                    <div class="timeline-box">
+                        <div class="timeline-item">Use staff approvals to control operational access.</div>
+                        <div class="timeline-item">Low-stock products are grouped for quick intervention.</div>
+                        <div class="timeline-item">Order details remain available from the linked drill-down page.</div>
+                    </div>
+                </div>
+            </aside>
+        </section>
+    </main>
+</body>
+</html>

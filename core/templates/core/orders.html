@@ -1,0 +1,67 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Orders{% endblock %}
+
+{% block content %}
+<section class="page-intro">
+    <div>
+        <div class="eyebrow">{% if is_customer_view %}Customer orders{% else %}Order management{% endif %}</div>
+        <h1 class="page-title">{% if is_customer_view %}My orders{% else %}Orders{% endif %}</h1>
+        <p class="page-subtitle">
+            {% if is_customer_view %}
+                Only your own order history and invoices are shown here.
+            {% else %}
+                Track customer purchases, payment methods, and invoice access in one clean operational table.
+            {% endif %}
+        </p>
+    </div>
+</section>
+
+<section class="table-panel">
+    <div class="panel-header">
+        <div>
+            <h2 class="panel-title">{% if is_customer_view %}Your order list{% else %}Order list{% endif %}</h2>
+            <p class="panel-meta">
+                {% if is_customer_view %}
+                    Personal order history for your account only.
+                {% else %}
+                    Designed for faster review of totals, customers, and payment state.
+                {% endif %}
+            </p>
+        </div>
+    </div>
+
+    <div class="table-scroll">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Customer</th>
+                    <th>Product</th>
+                    <th>Quantity</th>
+                    <th>Total Price</th>
+                    <th>Date</th>
+                    <th>Payment</th>
+                    <th>Invoice</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in orders %}
+                    <tr>
+                        <td><strong>{{ order.customer.name }}</strong></td>
+                        <td>{{ order.product.name }}</td>
+                        <td>{{ order.quantity }}</td>
+                        <td>Rs {{ order.total_price }}</td>
+                        <td>{{ order.created_at|date:"d M Y, H:i" }}</td>
+                        <td><span class="status-pill status-info">{{ order.payment_method }}</span></td>
+                        <td><a href="{% url 'invoice' order.id %}" class="btn btn-secondary">View</a></td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="7" class="empty-state">No orders found.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

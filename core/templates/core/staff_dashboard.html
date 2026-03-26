@@ -1,0 +1,229 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staff Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <script src="{% static 'js/theme.js' %}" defer></script>
+</head>
+<body>
+    <div class="page-backdrop"><div class="orb"></div></div>
+
+    <main class="main-shell">
+        <section class="hero-panel alt" style="margin-bottom: 24px;">
+            <div class="page-intro" style="margin-bottom: 0;">
+                <div>
+                    <div class="eyebrow">Staff command board</div>
+                    <h1 class="page-title">Customers, orders, invoices, and stock in one live workspace</h1>
+                    <p class="page-subtitle">A more creative operations screen for tracking activity, managing stock, and responding to low inventory quickly.</p>
+                </div>
+                <div class="action-row">
+                    <a href="{% url 'products' %}" class="btn btn-primary">Products</a>
+                    <a href="{% url 'orders' %}" class="btn btn-secondary">Orders</a>
+                    <a href="{% url 'logout' %}" class="btn btn-secondary">Logout</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="metrics-grid" style="margin-bottom: 24px;">
+            <div class="metric-card">
+                <div class="metric-label">Total products</div>
+                <div class="metric-value">{{ total_products }}</div>
+                <div class="metric-note">{{ healthy_stock_count }} products are in healthy stock range.</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Total customers</div>
+                <div class="metric-value">{{ total_customers }}</div>
+                <div class="metric-note">Live customer directory available for staff review.</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Orders tracked</div>
+                <div class="metric-value">{{ total_orders }}</div>
+                <div class="metric-note">Recent billing activity with invoice access.</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Low stock alerts</div>
+                <div class="metric-value">{{ critical_stock_count }}</div>
+                <div class="metric-note">Critical items needing immediate attention.</div>
+            </div>
+        </section>
+
+        <section class="split-layout" style="margin-bottom: 24px;">
+            <div class="summary-card">
+                <div class="panel-header">
+                    <div>
+                        <div class="eyebrow">Low stock alerts</div>
+                        <h2 class="panel-title">Restock watchlist</h2>
+                    </div>
+                </div>
+
+                <div class="stack-list">
+                    {% for product in low_stock %}
+                        <div class="list-item">
+                            <div class="detail-row"><span>Product</span><strong>{{ product.name }}</strong></div>
+                            <div class="detail-row"><span>Quantity left</span><strong>{{ product.quantity }}</strong></div>
+                            <span class="status-pill {% if product.quantity < 5 %}status-danger{% else %}status-warning{% endif %}">
+                                {% if product.quantity < 5 %}Critical{% else %}Low stock{% endif %}
+                            </span>
+                        </div>
+                    {% empty %}
+                        <div class="empty-state">No low-stock products. Inventory is looking stable.</div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="summary-card">
+                <div class="panel-header">
+                    <div>
+                        <div class="eyebrow">Revenue snapshot</div>
+                        <h2 class="panel-title">Billing overview</h2>
+                    </div>
+                </div>
+                <div class="summary-row"><span>Tracked revenue</span><strong>Rs {{ total_revenue }}</strong></div>
+                <div class="summary-row"><span>Products in catalog</span><strong>{{ total_products }}</strong></div>
+                <div class="summary-row"><span>Customers served</span><strong>{{ total_customers }}</strong></div>
+                <div class="summary-row"><span>Order volume</span><strong>{{ total_orders }}</strong></div>
+                <div class="summary-total"><span>Operational state</span><span>Live</span></div>
+            </div>
+        </section>
+
+        <section class="table-panel" style="margin-bottom: 24px;">
+            <div class="panel-header">
+                <div>
+                    <div class="eyebrow">Stock management</div>
+                    <h2 class="panel-title">Inventory board</h2>
+                    <p class="panel-meta">A single stock table for monitoring available units and identifying risk.</p>
+                </div>
+            </div>
+
+            <div class="table-scroll">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Vendor</th>
+                            <th>Price</th>
+                            <th>Quantity</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for product in products %}
+                            <tr>
+                                <td><strong>{{ product.name }}</strong></td>
+                                <td>
+                                    {% if product.vendor %}
+                                        {{ product.vendor.company_name|default:product.vendor.name }}
+                                    {% else %}
+                                        Not linked
+                                    {% endif %}
+                                </td>
+                                <td>Rs {{ product.price }}</td>
+                                <td>{{ product.quantity }}</td>
+                                <td>
+                                    {% if product.quantity < 5 %}
+                                        <span class="status-pill status-danger">Critical</span>
+                                    {% elif product.quantity < 10 %}
+                                        <span class="status-pill status-warning">Low</span>
+                                    {% elif product.quantity < 25 %}
+                                        <span class="status-pill status-info">Watch</span>
+                                    {% else %}
+                                        <span class="status-pill status-success">Healthy</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="5" class="empty-state">No products available for review.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="split-layout" style="margin-bottom: 24px;">
+            <div class="table-panel">
+                <div class="panel-header">
+                    <div>
+                        <div class="eyebrow">Customer details</div>
+                        <h2 class="panel-title">Customer directory</h2>
+                    </div>
+                </div>
+
+                <div class="table-scroll">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>Orders</th>
+                                <th>Spent</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for customer in customers %}
+                                <tr>
+                                    <td><strong>{{ customer.name }}</strong></td>
+                                    <td>{{ customer.email }}</td>
+                                    <td>{{ customer.phone }}</td>
+                                    <td>{{ customer.total_orders|default:"0" }}</td>
+                                    <td>Rs {{ customer.total_spent|default:"0" }}</td>
+                                </tr>
+                            {% empty %}
+                                <tr>
+                                    <td colspan="5" class="empty-state">No customers available right now.</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="table-panel">
+                <div class="panel-header">
+                    <div>
+                        <div class="eyebrow">Order details</div>
+                        <h2 class="panel-title">Recent orders with invoices</h2>
+                    </div>
+                </div>
+
+                <div class="table-scroll">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Order</th>
+                                <th>Customer</th>
+                                <th>Product</th>
+                                <th>Final</th>
+                                <th>Invoice</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for order in orders %}
+                                <tr>
+                                    <td><strong>#{{ order.id }}</strong></td>
+                                    <td>{{ order.customer.name }}</td>
+                                    <td>{{ order.product.name }}</td>
+                                    <td>Rs {{ order.final_amount }}</td>
+                                    <td><a href="{% url 'invoice' order.id %}" class="btn btn-secondary">Open</a></td>
+                                </tr>
+                            {% empty %}
+                                <tr>
+                                    <td colspan="5" class="empty-state">No recent orders to display.</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </main>
+</body>
+</html>

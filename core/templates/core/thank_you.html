@@ -1,0 +1,38 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thank You</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <script src="{% static 'js/theme.js' %}" defer></script>
+</head>
+<body>
+    <div class="page-backdrop"><div class="orb"></div></div>
+
+    <section class="center-stage">
+        <div class="glass-card center-card narrow">
+            <div class="theme-kicker">Billing complete</div>
+            <h1 class="hero-title" style="font-size: clamp(2rem, 5vw, 3rem);">Thank you for your order.</h1>
+            <p class="hero-subtitle">
+                Your purchase was recorded successfully. You can review invoices and order progress from the main workspace.
+            </p>
+
+            <div class="timeline-box">
+                <div class="timeline-item">Invoice details are available through your order history.</div>
+                <div class="timeline-item">Stock and billing totals were updated during checkout.</div>
+                <div class="timeline-item">Use the dashboard to continue shopping or review previous purchases.</div>
+            </div>
+
+            <div class="action-row" style="margin-top: 26px;">
+                <a href="{% url 'dashboard' %}" class="btn btn-primary">Open dashboard</a>
+                <a href="{% url 'orders' %}" class="btn btn-secondary">View orders</a>
+            </div>
+        </div>
+    </section>
+</body>
+</html>

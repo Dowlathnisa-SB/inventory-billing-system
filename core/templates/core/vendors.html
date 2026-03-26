@@ -1,0 +1,224 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Vendors{% endblock %}
+
+{% block content %}
+<section class="page-intro">
+    <div>
+        <div class="eyebrow">Procurement desk</div>
+        <h1 class="page-title">Vendors and purchase billing</h1>
+        <p class="page-subtitle">Track where products come from, record purchase bills, and keep stock tied to supplier activity.</p>
+    </div>
+</section>
+
+{% if message %}
+    <div class="note-card" style="margin-bottom: 24px;">{{ message }}</div>
+{% endif %}
+{% if error %}
+    <div class="alert" style="margin-bottom: 24px;">{{ error }}</div>
+{% endif %}
+
+<section class="metrics-grid" style="margin-bottom: 24px;">
+    <div class="metric-card">
+        <div class="metric-label">Total Vendors</div>
+        <div class="metric-value">{{ total_vendors }}</div>
+        <div class="metric-note">Supplier directory available to staff and admin.</div>
+    </div>
+    <div class="metric-card">
+        <div class="metric-label">Purchase Bills</div>
+        <div class="metric-value">{{ total_purchase_bills }}</div>
+        <div class="metric-note">Recorded procurement bills in the system.</div>
+    </div>
+    <div class="metric-card">
+        <div class="metric-label">Vendor Spend</div>
+        <div class="metric-value">Rs {{ total_vendor_spend }}</div>
+        <div class="metric-note">Total value of recorded purchases.</div>
+    </div>
+</section>
+
+<section class="split-layout" style="margin-bottom: 24px;">
+    <div class="panel">
+        <div class="panel-header">
+            <div>
+                <div class="eyebrow">Add vendor</div>
+                <h2 class="panel-title">Supplier profile</h2>
+            </div>
+        </div>
+
+        <form method="POST" class="surface-grid">
+            {% csrf_token %}
+            <input type="hidden" name="action_type" value="create_vendor">
+
+            <div class="form-grid">
+                <div class="field">
+                    <label for="name">Vendor name</label>
+                    <input id="name" type="text" name="name" placeholder="Enter contact name" required>
+                </div>
+                <div class="field">
+                    <label for="company_name">Company name</label>
+                    <input id="company_name" type="text" name="company_name" placeholder="Enter company name">
+                </div>
+                <div class="field">
+                    <label for="email">Email</label>
+                    <input id="email" type="email" name="email" placeholder="vendor@example.com">
+                </div>
+                <div class="field">
+                    <label for="phone">Phone</label>
+                    <input id="phone" type="text" name="phone" placeholder="Enter phone number">
+                </div>
+                <div class="field">
+                    <label for="gst_number">GST number</label>
+                    <input id="gst_number" type="text" name="gst_number" placeholder="Enter GST number">
+                </div>
+                <div class="field span-2">
+                    <label for="address">Address</label>
+                    <textarea id="address" name="address" placeholder="Enter vendor address"></textarea>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Add vendor</button>
+        </form>
+    </div>
+
+    <div class="panel">
+        <div class="panel-header">
+            <div>
+                <div class="eyebrow">Record purchase</div>
+                <h2 class="panel-title">Vendor bill entry</h2>
+            </div>
+        </div>
+
+        <form method="POST" class="surface-grid">
+            {% csrf_token %}
+            <input type="hidden" name="action_type" value="record_purchase">
+
+            <div class="form-grid">
+                <div class="field">
+                    <label for="vendor">Vendor</label>
+                    <select id="vendor" name="vendor" required>
+                        <option value="">Choose vendor</option>
+                        {% for vendor in vendors %}
+                            <option value="{{ vendor.id }}">{{ vendor.company_name|default:vendor.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="field">
+                    <label for="product">Product</label>
+                    <select id="product" name="product" required>
+                        <option value="">Choose product</option>
+                        {% for product in products %}
+                            <option value="{{ product.id }}">{{ product.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="field">
+                    <label for="quantity">Quantity bought</label>
+                    <input id="quantity" type="number" name="quantity" min="1" placeholder="Enter quantity" required>
+                </div>
+                <div class="field">
+                    <label for="unit_cost">Unit cost</label>
+                    <input id="unit_cost" type="number" name="unit_cost" step="0.01" min="0.01" placeholder="Enter unit cost" required>
+                </div>
+                <div class="field">
+                    <label for="invoice_number">Invoice number</label>
+                    <input id="invoice_number" type="text" name="invoice_number" placeholder="Optional bill or invoice number">
+                </div>
+                <div class="field span-2">
+                    <label for="notes">Notes</label>
+                    <textarea id="notes" name="notes" placeholder="Add billing or sourcing notes"></textarea>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Record purchase bill</button>
+        </form>
+    </div>
+</section>
+
+<section class="split-layout">
+    <div class="table-panel">
+        <div class="panel-header">
+            <div>
+                <div class="eyebrow">Vendor directory</div>
+                <h2 class="panel-title">Supplier details</h2>
+            </div>
+        </div>
+
+        <div class="table-scroll">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Vendor</th>
+                        <th>Contact</th>
+                        <th>GST</th>
+                        <th>Products</th>
+                        <th>Spend</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for vendor in vendors %}
+                        <tr>
+                            <td>
+                                <strong>{{ vendor.company_name|default:vendor.name }}</strong><br>
+                                <span class="mini-copy">{{ vendor.name }}</span>
+                            </td>
+                            <td>
+                                {{ vendor.email|default:"No email" }}<br>
+                                <span class="mini-copy">{{ vendor.phone|default:"No phone" }}</span>
+                            </td>
+                            <td>{{ vendor.gst_number|default:"N/A" }}</td>
+                            <td>{{ vendor.total_products|default:"0" }}</td>
+                            <td>Rs {{ vendor.total_purchase_value|default:"0" }}</td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="5" class="empty-state">No vendors added yet.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="table-panel">
+        <div class="panel-header">
+            <div>
+                <div class="eyebrow">Purchase history</div>
+                <h2 class="panel-title">Recent vendor bills</h2>
+            </div>
+        </div>
+
+        <div class="table-scroll">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Vendor</th>
+                        <th>Product</th>
+                        <th>Qty</th>
+                        <th>Bill</th>
+                        <th>Total</th>
+                        <th>Invoice</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for purchase in purchases %}
+                        <tr>
+                            <td>{{ purchase.purchased_at|date:"d M Y" }}</td>
+                            <td><strong>{{ purchase.vendor.company_name|default:purchase.vendor.name }}</strong></td>
+                            <td>{{ purchase.product.name }}</td>
+                            <td>{{ purchase.quantity }}</td>
+                            <td>{{ purchase.invoice_number|default:"No ref" }}</td>
+                            <td>Rs {{ purchase.total_cost }}</td>
+                            <td><a href="{% url 'vendor_purchase_invoice' purchase.id %}" class="btn btn-secondary">Open</a></td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="7" class="empty-state">No purchase bills recorded yet.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+{% endblock %}

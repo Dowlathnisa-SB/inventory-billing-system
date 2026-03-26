@@ -1,0 +1,126 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <script src="{% static 'js/theme.js' %}" defer></script>
+</head>
+<body>
+    <div class="page-backdrop"><div class="orb"></div></div>
+
+    <main class="main-shell">
+        <section class="page-intro">
+            <div>
+                <div class="eyebrow">Secure checkout</div>
+                <h1 class="page-title">Review and place your order</h1>
+                <p class="page-subtitle">Provide delivery details, select a payment method, and confirm the final billing summary.</p>
+            </div>
+            <div class="action-row">
+                <a href="{% url 'view_cart' %}" class="btn btn-secondary">Back to cart</a>
+            </div>
+        </section>
+
+        <section class="split-layout">
+            <div class="panel">
+                <div class="panel-header">
+                    <h2 class="panel-title">Billing and delivery details</h2>
+                </div>
+
+                {% if error %}
+                    <div class="alert">{{ error }}</div>
+                {% endif %}
+
+                <form method="POST" action="{% url 'process_payment' %}" class="surface-grid">
+                    {% csrf_token %}
+
+                    <div class="panel" style="padding: 20px;">
+                        <div class="panel-header">
+                            <h3 class="panel-title">Shipping information</h3>
+                        </div>
+                        <div class="form-grid">
+                            <div class="field">
+                                <label for="name">Full name</label>
+                                <input id="name" type="text" name="name" value="{{ user.first_name }}" required>
+                            </div>
+                            <div class="field">
+                                <label for="email">Email</label>
+                                <input id="email" type="email" name="email" value="{{ user.email }}" required>
+                            </div>
+                            <div class="field">
+                                <label for="phone">Phone</label>
+                                <input id="phone" type="tel" name="phone" value="{{ customer.phone }}" required>
+                            </div>
+                            <div class="field">
+                                <label for="address">Address</label>
+                                <input id="address" type="text" name="address" value="{{ customer.address }}" placeholder="Enter full delivery address" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="panel" style="padding: 20px;">
+                        <div class="panel-header">
+                            <h3 class="panel-title">Payment method</h3>
+                        </div>
+                        <div class="selection-grid">
+                            <div class="selection-card">
+                                <input id="payment-cash" type="radio" name="payment_method" value="Cash" checked>
+                                <label for="payment-cash">
+                                    <strong>Cash on delivery</strong>
+                                    <span>Pay when the order reaches you.</span>
+                                </label>
+                            </div>
+                            <div class="selection-card">
+                                <input id="payment-upi" type="radio" name="payment_method" value="UPI">
+                                <label for="payment-upi">
+                                    <strong>UPI payment</strong>
+                                    <span>Quick payment through your preferred app.</span>
+                                </label>
+                            </div>
+                            <div class="selection-card">
+                                <input id="payment-card" type="radio" name="payment_method" value="Card">
+                                <label for="payment-card">
+                                    <strong>Card</strong>
+                                    <span>Debit or credit card checkout option.</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="panel" style="padding: 20px;">
+                        <div class="field">
+                            <label>
+                                <input type="checkbox" required style="width: auto; min-height: auto; margin-right: 10px;">
+                                I confirm that the delivery and payment details are correct.
+                            </label>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-block">Place order</button>
+                </form>
+            </div>
+
+            <aside class="summary-card">
+                <div class="panel-header">
+                    <h2 class="panel-title">Order summary</h2>
+                </div>
+                {% for item in cart_items %}
+                    <div class="summary-row"><span>{{ item.product.name }} x {{ item.quantity }}</span><strong>Rs {{ item.get_total_price }}</strong></div>
+                {% endfor %}
+                <div class="summary-row"><span>Subtotal</span><strong>Rs {{ subtotal }}</strong></div>
+                <div class="summary-row"><span>GST</span><strong>+ Rs {{ gst }}</strong></div>
+                <div class="summary-total"><span>Total amount</span><span>Rs {{ total }}</span></div>
+
+                <div class="note-card" style="margin-top: 20px;">
+                    Secure checkout with a clean, tax-aware billing breakdown for each order.
+                </div>
+            </aside>
+        </section>
+    </main>
+</body>
+</html>

@@ -1,0 +1,95 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice #{{ order.id }}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <script src="{% static 'js/theme.js' %}" defer></script>
+</head>
+<body>
+    <div class="page-backdrop"><div class="orb"></div></div>
+
+    <section class="glass-card invoice-sheet">
+        <div class="invoice-top">
+            <div>
+                <div class="eyebrow">Invoice</div>
+                <h1 class="panel-title" style="font-size: 2rem;">Order #{{ order.id }}</h1>
+                <p class="panel-copy">Professional invoice view with a clean billing summary.</p>
+            </div>
+            <div class="muted-block">
+                <div class="detail-row"><span>Status</span><strong>{{ order.status|default:"Completed" }}</strong></div>
+                <div class="detail-row"><span>Payment</span><strong>{{ order.payment_method|default:"Cash" }}</strong></div>
+                <div class="detail-row"><span>Date</span><strong>{{ order.created_at|date:"d M Y" }}</strong></div>
+            </div>
+        </div>
+
+        <div class="invoice-body">
+            <div class="invoice-grid">
+                <div class="muted-block">
+                    <div class="eyebrow">From</div>
+                    <strong>Inventory Billing System</strong>
+                    <p class="panel-copy">support@inventorybilling.com<br>Inventory and billing operations center</p>
+                </div>
+                <div class="muted-block">
+                    <div class="eyebrow">Bill to</div>
+                    <strong>{{ order.customer.name }}</strong>
+                    <p class="panel-copy">
+                        {{ order.customer.email }}<br>
+                        {{ order.customer.phone }}<br>
+                        {{ order.customer.address|default:"Address not provided" }}
+                    </p>
+                </div>
+            </div>
+
+            <div class="table-panel" style="margin-top: 24px;">
+                <div class="table-scroll">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Unit Price</th>
+                                <th>Quantity</th>
+                                <th>Subtotal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>{{ order.product.name }}</strong></td>
+                                <td>Rs {{ order.product.price }}</td>
+                                <td>{{ order.quantity }}</td>
+                                <td>Rs {{ order.total_price }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="split-layout" style="margin-top: 24px;">
+                <div class="muted-block">
+                    <div class="eyebrow">Notes</div>
+                    <p class="panel-copy">
+                        This invoice reflects discount and GST values already applied during billing. Keep it for your
+                        purchase records and future support requests.
+                    </p>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-row"><span>Subtotal</span><strong>Rs {{ order.total_price }}</strong></div>
+                    <div class="summary-row"><span>Discount</span><strong>- Rs {{ order.discount }}</strong></div>
+                    <div class="summary-row"><span>GST</span><strong>+ Rs {{ order.gst_amount }}</strong></div>
+                    <div class="summary-total"><span>Final amount</span><span>Rs {{ order.final_amount }}</span></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="print-actions">
+            <button class="btn btn-primary" onclick="window.print()">Print invoice</button>
+            <a href="{% url 'dashboard' %}" class="btn btn-secondary">Back to dashboard</a>
+        </div>
+    </section>
+</body>
+</html>

@@ -1,0 +1,72 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory Billing System</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <script src="{% static 'js/theme.js' %}" defer></script>
+</head>
+<body>
+    <div class="page-backdrop"><div class="orb"></div></div>
+
+    <section class="hero-shell">
+        <div class="theme-toggle-row">
+            <button type="button" class="theme-toggle" data-theme-toggle>Switch theme</button>
+        </div>
+        <div class="hero-grid">
+            <div class="hero-panel alt">
+                <div class="theme-kicker">Inventory Billing</div>
+                <h1 class="hero-title">Elegant control for products, billing, and orders.</h1>
+                <p class="hero-subtitle">Fast, polished, and built to feel premium.</p>
+
+                <div class="landing-motion" style="margin-top: 28px;">
+                    <div class="beam"></div>
+                    <div class="motion-grid"></div>
+                    <div class="pulse-ring"></div>
+                    <div class="pulse-ring ring-two"></div>
+                    <div class="motion-orb one"></div>
+                    <div class="motion-orb two"></div>
+                    <div class="floating-chip top">Live Billing</div>
+                    <div class="floating-chip mid">Smart Inventory</div>
+                    <div class="floating-chip low">Fast Checkout</div>
+                </div>
+            </div>
+
+            <div class="hero-panel">
+                <div class="eyebrow">Sign in</div>
+                <h2 class="panel-title" style="font-size: 1.8rem; margin-bottom: 10px;">Choose your portal</h2>
+
+                <div class="stack-list">
+                    <a href="{% url 'login' %}" class="action-card" style="text-decoration: none;">
+                        <span class="status-pill status-info">Customer</span>
+                        <h3>Customer access</h3>
+                        <p class="mini-copy">Shop, track orders, view invoices.</p>
+                    </a>
+
+                    <a href="{% url 'login' %}?role=staff" class="action-card" style="text-decoration: none;">
+                        <span class="status-pill status-warning">Staff</span>
+                        <h3>Staff workspace</h3>
+                        <p class="mini-copy">Monitor stock and daily operations.</p>
+                    </a>
+
+                    <a href="{% url 'login' %}?role=admin" class="action-card" style="text-decoration: none;">
+                        <span class="status-pill status-success">Admin</span>
+                        <h3>Admin control center</h3>
+                        <p class="mini-copy">Approvals, revenue, and oversight.</p>
+                    </a>
+                </div>
+
+                <div class="action-row" style="margin-top: 24px;">
+                    <a href="{% url 'register' %}" class="btn btn-primary">Create account</a>
+                    <a href="/admin/" class="btn btn-secondary">System administrator</a>
+                </div>
+            </div>
+        </div>
+    </section>
+</body>
+</html>

@@ -1,0 +1,77 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Create Billing{% endblock %}
+
+{% block content %}
+<section class="page-intro">
+    <div>
+        <div class="eyebrow">Billing workflow</div>
+        <h1 class="page-title">Create an order</h1>
+        <p class="page-subtitle">Generate a bill using the same shared form language across the app.</p>
+    </div>
+</section>
+
+<section class="split-layout">
+    <div class="panel">
+        <div class="panel-header">
+            <div>
+                <h2 class="panel-title">Billing details</h2>
+                <p class="panel-meta">Pick a customer, choose a product, and set quantity and payment method.</p>
+            </div>
+        </div>
+
+        {% if error %}
+            <div class="alert">{{ error }}</div>
+        {% endif %}
+
+        <form method="POST" class="surface-grid">
+            {% csrf_token %}
+            <div class="field">
+                <label for="customer">Customer</label>
+                <select id="customer" name="customer">
+                    {% for customer in customers %}
+                        <option value="{{ customer.id }}">{{ customer.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="field">
+                <label for="product">Product</label>
+                <select id="product" name="product">
+                    {% for product in products %}
+                        <option value="{{ product.id }}">{{ product.name }} - Rs {{ product.price }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="field">
+                <label for="quantity">Quantity</label>
+                <input id="quantity" type="number" name="quantity" min="1" required>
+            </div>
+
+            <div class="field">
+                <label for="payment_method">Payment method</label>
+                <select id="payment_method" name="payment_method" required>
+                    <option value="">Select payment method</option>
+                    <option value="Cash">Cash</option>
+                    <option value="UPI">UPI</option>
+                    <option value="Card">Card</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block">Generate bill</button>
+        </form>
+    </div>
+
+    <aside class="summary-card">
+        <div class="panel-header">
+            <h2 class="panel-title">Workflow notes</h2>
+        </div>
+        <div class="timeline-box">
+            <div class="timeline-item">Product stock is reduced after the order is created.</div>
+            <div class="timeline-item">Discount and GST are calculated during billing.</div>
+            <div class="timeline-item">Customers receive invoice details by email when available.</div>
+        </div>
+    </aside>
+</section>
+{% endblock %}

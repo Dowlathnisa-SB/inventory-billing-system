@@ -1,0 +1,82 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping Cart</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <script src="{% static 'js/theme.js' %}" defer></script>
+</head>
+<body>
+    <div class="page-backdrop"><div class="orb"></div></div>
+
+    <main class="main-shell">
+        <section class="page-intro">
+            <div>
+                <div class="eyebrow">Cart review</div>
+                <h1 class="page-title">Shopping cart</h1>
+                <p class="page-subtitle">Adjust quantities, review totals, and continue to checkout when everything looks right.</p>
+            </div>
+            <div class="action-row">
+                <a href="{% url 'dashboard' %}" class="btn btn-secondary">Back to dashboard</a>
+            </div>
+        </section>
+
+        <section class="split-layout">
+            <div class="panel">
+                <div class="panel-header">
+                    <h2 class="panel-title">Cart items</h2>
+                </div>
+
+                {% if cart_items %}
+                    <div class="stack-list">
+                        {% for item in cart_items %}
+                            <div class="order-item">
+                                <div class="detail-row"><span>Product</span><strong>{{ item.product.name }}</strong></div>
+                                <div class="detail-row"><span>Unit price</span><strong>Rs {{ item.product.price }}</strong></div>
+                                <div class="detail-row"><span>Subtotal</span><strong>Rs {{ item.get_total_price }}</strong></div>
+
+                                <form method="POST" action="{% url 'update_cart' item.id %}" class="form-grid" style="margin-top: 16px;">
+                                    {% csrf_token %}
+                                    <div class="field">
+                                        <label for="quantity-{{ item.id }}">Quantity</label>
+                                        <input id="quantity-{{ item.id }}" type="number" name="quantity" min="1" value="{{ item.quantity }}">
+                                    </div>
+                                    <div class="action-row" style="align-items: end;">
+                                        <button type="submit" class="btn btn-primary">Update</button>
+                                        <a href="{% url 'remove_from_cart' item.id %}" class="btn btn-danger">Remove</a>
+                                    </div>
+                                </form>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="empty-state">
+                        Your cart is empty. Add products from the dashboard to start building an order.
+                    </div>
+                {% endif %}
+            </div>
+
+            <aside class="summary-card">
+                <div class="panel-header">
+                    <h2 class="panel-title">Order summary</h2>
+                </div>
+                <div class="summary-row"><span>Subtotal</span><strong>Rs {{ subtotal }}</strong></div>
+                <div class="summary-row"><span>GST</span><strong>+ Rs {{ gst }}</strong></div>
+                <div class="summary-total"><span>Total</span><span>Rs {{ total }}</span></div>
+
+                <div class="action-row" style="margin-top: 20px;">
+                    {% if cart_items %}
+                        <a href="{% url 'checkout' %}" class="btn btn-primary btn-block">Proceed to checkout</a>
+                    {% endif %}
+                    <a href="{% url 'dashboard' %}" class="btn btn-secondary btn-block">Continue shopping</a>
+                </div>
+            </aside>
+        </section>
+    </main>
+</body>
+</html>

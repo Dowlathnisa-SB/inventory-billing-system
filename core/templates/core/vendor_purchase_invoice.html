@@ -1,0 +1,97 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vendor Purchase Invoice #{{ purchase.id }}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <script src="{% static 'js/theme.js' %}" defer></script>
+</head>
+<body>
+    <div class="page-backdrop"><div class="orb"></div></div>
+
+    <section class="glass-card invoice-sheet">
+        <div class="invoice-top">
+            <div>
+                <div class="eyebrow">Vendor Invoice</div>
+                <h1 class="panel-title" style="font-size: 2rem;">Purchase Bill #{{ purchase.id }}</h1>
+                <p class="panel-copy">Procurement invoice for vendor-linked stock intake.</p>
+            </div>
+            <div class="muted-block">
+                <div class="detail-row"><span>Invoice ref</span><strong>{{ purchase.invoice_number|default:"No reference" }}</strong></div>
+                <div class="detail-row"><span>Date</span><strong>{{ purchase.purchased_at|date:"d M Y" }}</strong></div>
+                <div class="detail-row"><span>Total cost</span><strong>Rs {{ purchase.total_cost }}</strong></div>
+            </div>
+        </div>
+
+        <div class="invoice-body">
+            <div class="invoice-grid">
+                <div class="muted-block">
+                    <div class="eyebrow">Vendor</div>
+                    <strong>{{ purchase.vendor.company_name|default:purchase.vendor.name }}</strong>
+                    <p class="panel-copy">
+                        {{ purchase.vendor.name }}<br>
+                        {{ purchase.vendor.email|default:"No email" }}<br>
+                        {{ purchase.vendor.phone|default:"No phone" }}<br>
+                        {{ purchase.vendor.gst_number|default:"No GST number" }}
+                    </p>
+                </div>
+                <div class="muted-block">
+                    <div class="eyebrow">Stock intake</div>
+                    <strong>{{ purchase.product.name }}</strong>
+                    <p class="panel-copy">
+                        Quantity: {{ purchase.quantity }}<br>
+                        Unit cost: Rs {{ purchase.unit_cost }}<br>
+                        Total: Rs {{ purchase.total_cost }}
+                    </p>
+                </div>
+            </div>
+
+            <div class="table-panel" style="margin-top: 24px;">
+                <div class="table-scroll">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Quantity</th>
+                                <th>Unit Cost</th>
+                                <th>Total Cost</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>{{ purchase.product.name }}</strong></td>
+                                <td>{{ purchase.quantity }}</td>
+                                <td>Rs {{ purchase.unit_cost }}</td>
+                                <td>Rs {{ purchase.total_cost }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="split-layout" style="margin-top: 24px;">
+                <div class="muted-block">
+                    <div class="eyebrow">Notes</div>
+                    <p class="panel-copy">{{ purchase.notes|default:"No additional procurement notes were recorded for this bill." }}</p>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-row"><span>Vendor</span><strong>{{ purchase.vendor.company_name|default:purchase.vendor.name }}</strong></div>
+                    <div class="summary-row"><span>Quantity</span><strong>{{ purchase.quantity }}</strong></div>
+                    <div class="summary-row"><span>Unit cost</span><strong>Rs {{ purchase.unit_cost }}</strong></div>
+                    <div class="summary-total"><span>Total purchase</span><span>Rs {{ purchase.total_cost }}</span></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="print-actions">
+            <button class="btn btn-primary" onclick="window.print()">Print invoice</button>
+            <a href="{% url 'vendors' %}" class="btn btn-secondary">Back to vendors</a>
+        </div>
+    </section>
+</body>
+</html>
